@@ -1,0 +1,584 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Gerencia de Desarrollo de Negocios y Marca</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap">
+<style>
+/* Layout: fondo grafito único con brillo azul; cada sección = título a la izquierda + tarjetas de vidrio a la derecha. Apertura con banda de luz azul. */
+:root {
+  --bg: #202124;
+  --fg: #FFFFFF;
+  --muted: #9AA0A6;
+  --dim: #9AA0A6;
+  --glass: rgba(255,255,255,.045);
+  --glass-top: rgba(255,255,255,.075);
+  --border: rgba(255,255,255,.12);
+  --rule: rgba(255,255,255,.08);
+  --blue: #0242D1;
+  --blue-hi: #2A63FF;
+  --blue-text: #7FA4FF;
+  --ice: #CADCFC;
+  --display: "Helvetica Now Display", "HelveticaNowDisplay-Bold", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --body: "DM Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --wrap: 1120px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+body {
+  color: var(--fg); font-family: var(--body); font-size: 16.5px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+  background:
+    radial-gradient(1100px 700px at 92% 18%, rgba(2,66,209,.30), transparent 62%),
+    radial-gradient(900px 800px at -10% 62%, rgba(2,66,209,.16), transparent 60%),
+    radial-gradient(900px 700px at 100% 95%, rgba(2,66,209,.16), transparent 60%),
+    var(--bg);
+  background-color: var(--bg);
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 700; margin: 0; line-height: 1.06; letter-spacing: -0.035em; text-wrap: balance; }
+p { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+a { color: inherit; }
+a:focus-visible { outline: 2px solid var(--ice); outline-offset: 3px; border-radius: 999px; }
+
+.band { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: var(--wrap); margin: 0 auto; }
+.eyebrow { font-family: var(--body); font-weight: 700; font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--dim); }
+
+/* Sección tipo: título izquierda, contenido derecha */
+.sec { padding-block: 88px; border-top: 1px solid var(--rule); }
+.split { display: grid; grid-template-columns: 300px 1fr; gap: 56px; align-items: start; }
+.split > * { min-width: 0; }
+.head { display: grid; gap: 14px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 84px); }
+.head h2 { font-size: clamp(30px, 3.6vw, 40px); }
+.head p { color: var(--muted); font-size: 15.5px; }
+
+/* Vidrio */
+.glass { background: linear-gradient(160deg, rgba(255,255,255,.09), rgba(255,255,255,.025)); border: 1px solid rgba(255,255,255,.13); border-radius: 16px; box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 10px 32px -16px rgba(0,0,0,.45); -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%); }
+.card { padding: 24px; display: grid; gap: 10px; align-content: start; }
+.card h3 { font-size: 21px; letter-spacing: -0.025em; }
+.card p, .card li { color: var(--muted); font-size: 15px; }
+.cards-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.list { display: grid; gap: 7px; }
+.list li { position: relative; padding-left: 15px; }
+.list li::before { content: ""; position: absolute; left: 0; top: .72em; width: 5px; height: 5px; border-radius: 50%; background: var(--blue-text); }
+
+.pill { display: inline-flex; align-items: center; gap: 6px; justify-self: start; padding: 7px 14px; border-radius: 999px; font-weight: 700; font-size: 13px; color: #fff; text-decoration: none; background: linear-gradient(180deg, var(--blue-hi), var(--blue)); box-shadow: 0 6px 18px rgba(2,66,209,.45), inset 0 1px 0 rgba(255,255,255,.25); transition: transform .15s ease, box-shadow .15s ease; }
+.pill:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(2,66,209,.6), inset 0 1px 0 rgba(255,255,255,.25); }
+.pill.ghost { background: rgba(255,255,255,.06); box-shadow: inset 0 0 0 1px var(--border); }
+.pill svg { width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Nav */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: rgba(32,33,36,.9); }
+.nav { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: rgba(32,33,36,.88); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); border-bottom: 1px solid var(--rule); }
+.nav .wrap { display: flex; align-items: center; gap: 24px; height: 56px; }
+.brand { font-family: var(--display); font-weight: 700; letter-spacing: -0.01em; font-size: 15px; white-space: nowrap; }
+.brand span { color: var(--dim); font-weight: 400; }
+.nav ul { display: flex; gap: 2px; margin-left: auto; overflow-x: auto; scrollbar-width: none; min-width: 0; }
+.nav ul::-webkit-scrollbar { display: none; }
+.nav a { display: block; padding: 6px 12px; border-radius: 999px; text-decoration: none; font-size: 13.5px; color: var(--muted); white-space: nowrap; }
+.nav a:hover { color: var(--fg); background: rgba(255,255,255,.06); }
+
+/* Hero: carátula azul con la foto de estelas, como CECOR */
+.hero { position: relative; overflow: hidden; padding-block: 96px 80px; background: var(--blue); }
+.hero::before, .close::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: url("cover.jpg") center 70% / cover no-repeat; opacity: .6; mix-blend-mode: screen; }
+.cover-logo { position: absolute; top: 28px; right: max(16px, env(safe-area-inset-right, 0px)); width: 84px; height: auto; z-index: 1; }
+@media (max-width: 560px) { .cover-logo { width: 56px; top: 22px; } }
+.hero .wrap { display: grid; gap: 22px; position: relative; }
+.hero .eyebrow { color: #C3D4FB; }
+.hero .sub { color: #FFFFFF !important; }
+.hero .chip { color: #FFFFFF; border-color: rgba(255,255,255,.35); background: rgba(255,255,255,.08); }
+.hero .pill { background: #FFFFFF; color: var(--blue); box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+.hero .pill.ghost { background: rgba(255,255,255,.1); color: #FFFFFF; box-shadow: inset 0 0 0 1px rgba(255,255,255,.4); }
+.hero h1 { font-size: clamp(42px, 7vw, 84px); letter-spacing: -0.045em; max-width: 12ch; }
+.hero .claim { font-family: var(--display); font-weight: 700; font-size: clamp(20px, 2.4vw, 26px); letter-spacing: -0.02em; max-width: 32ch; line-height: 1.25; }
+.hero .sub { color: var(--muted); font-size: 18px; max-width: 54ch; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--border); background: rgba(255,255,255,.04); border-radius: 999px; padding: 5px 13px; font-size: 13px; color: var(--muted); }
+.ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+
+/* Verbos */
+.verb { padding: 24px; display: grid; gap: 10px; align-content: start; }
+.verb .k { font-size: 11.5px; letter-spacing: .16em; font-weight: 700; color: var(--dim); }
+.verb h3 { font-size: clamp(32px, 3.4vw, 42px); letter-spacing: -0.04em; }
+.verb p { color: var(--muted); font-size: 15px; }
+.verb .pill { margin-top: 6px; }
+
+/* Por qué */
+.quote { font-family: var(--display); font-weight: 700; font-size: clamp(26px, 3vw, 34px); letter-spacing: -0.03em; line-height: 1.15; padding: 30px; }
+.quote em { font-style: normal; color: var(--blue-text); }
+.why-item { display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 20px 22px; align-items: start; }
+.ic { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; background: rgba(42,99,255,.16); box-shadow: inset 0 0 0 1px rgba(127,164,255,.25); }
+.ic svg { width: 19px; height: 19px; fill: none; stroke: var(--blue-text); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.why-item b { display: block; font-family: var(--display); font-size: 16.5px; letter-spacing: -0.015em; }
+.why-item span { color: var(--muted); font-size: 15px; }
+.stack { display: grid; gap: 14px; }
+
+/* Ejes */
+.axis.core { border-color: rgba(127,164,255,.35); background: linear-gradient(180deg, rgba(42,99,255,.20), rgba(2,66,209,.08)); }
+.axis .top { display: flex; justify-content: space-between; align-items: center; }
+.tag { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; padding: 3px 9px; border-radius: 999px; color: var(--ice); background: rgba(42,99,255,.28); }
+
+/* Decide */
+.drow { display: grid; grid-template-columns: 1fr auto; gap: 16px; padding-top: 14px; border-top: 1px solid var(--rule); align-items: baseline; }
+.drow b { font-weight: 500; font-size: 15.5px; }
+.drow small { font-size: 13px; color: var(--dim); text-align: right; }
+.own { border-color: rgba(127,164,255,.35); background: linear-gradient(180deg, rgba(42,99,255,.20), rgba(2,66,209,.06)); }
+.own .drow small { color: var(--blue-text); }
+.note { margin-top: 18px; color: var(--muted); font-size: 15.5px; }
+.note b { color: var(--fg); font-weight: 500; }
+
+/* Cliente */
+.hook { font-family: var(--display); font-weight: 700; font-size: clamp(30px, 4vw, 48px); letter-spacing: -0.04em; line-height: 1.05; padding: 30px; display: grid; gap: 20px; }
+.hook mark { background: none; color: var(--blue-text); }
+.cost { display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; line-height: 1.4; }
+.cost span { display: inline-flex; align-items: center; line-height: 1.4; font-family: var(--body); font-size: 13px; font-weight: 500; letter-spacing: 0; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.08); border-radius: 999px; padding: 5px 13px; color: #FFFFFF; }
+.kv { display: grid; }
+.kv div { display: grid; grid-template-columns: 110px 1fr; gap: 16px; padding: 16px 22px; }
+.kv div + div { border-top: 1px solid var(--rule); }
+.kv .k { font-size: 11px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; color: var(--dim); padding-top: 3px; }
+.kv .v { color: var(--fg); font-size: 15px; }
+
+/* Organigrama */
+.org-box { padding: 24px; overflow-x: auto; }
+.org { display: block; width: 100%; min-width: 600px; height: auto; }
+.org .box { fill: rgba(255,255,255,.05); stroke: rgba(255,255,255,.16); stroke-width: 1.2; }
+.org .box.me { fill: #0242D1; stroke: #2A63FF; }
+.org .box.team { fill: rgba(42,99,255,.12); stroke: rgba(127,164,255,.35); }
+.org .t { font-family: var(--display); font-weight: 700; font-size: 15px; fill: #F4F5F8; letter-spacing: -0.01em; }
+.org .s { font-family: var(--body); font-size: 12.5px; fill: #A4A8B4; }
+.org .me-s { fill: rgba(255,255,255,.82); }
+.org .ln { stroke: rgba(255,255,255,.28); stroke-width: 1.3; fill: none; }
+.org .dash { stroke: #7FA4FF; stroke-width: 1.5; fill: none; stroke-dasharray: 6 5; }
+.org .lbl { font-family: var(--body); font-size: 12px; fill: #7FA4FF; font-weight: 500; }
+.legend { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 14px; font-size: 13px; color: var(--dim); }
+.legend span { display: inline-flex; align-items: center; gap: 10px; }
+.legend i { width: 26px; border-top: 1.4px solid rgba(255,255,255,.35); display: inline-block; }
+.legend i.d { border-top: 1.4px dashed var(--blue-text); }
+
+/* Puestos */
+.role-head { display: grid; gap: 14px; }
+.acr { font-family: var(--display); font-weight: 700; font-size: clamp(76px, 10vw, 128px); line-height: .82; letter-spacing: -0.06em; color: transparent; -webkit-text-stroke: 1.5px var(--blue-text); }
+.role-head .name { font-size: 11.5px; letter-spacing: .16em; text-transform: uppercase; font-weight: 700; color: var(--dim); }
+.role-head h2 { font-size: clamp(26px, 2.8vw, 32px); }
+.eld .acr { -webkit-text-stroke-color: var(--ice); }
+.checks { display: grid; gap: 10px; }
+.checks li { display: grid; grid-template-columns: 20px 1fr; gap: 10px; color: var(--muted); font-size: 15px; }
+.checks svg { width: 16px; height: 16px; margin-top: 4px; stroke: var(--blue-text); fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.checks b { color: var(--fg); font-weight: 500; }
+.facts { display: grid; grid-template-columns: 1fr 1fr; }
+.facts div { padding: 16px 20px; display: grid; gap: 3px; }
+.facts div:nth-child(odd) { border-right: 1px solid var(--rule); }
+.facts div:nth-child(n+3) { border-top: 1px solid var(--rule); }
+.facts .k { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; color: var(--dim); }
+.facts .v { font-size: 15px; }
+.measure { display: flex; gap: 14px; align-items: center; padding: 16px 20px; border-radius: 14px; background: linear-gradient(180deg, rgba(42,99,255,.24), rgba(2,66,209,.12)); border: 1px solid rgba(127,164,255,.35); }
+.measure .k { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; color: var(--ice); white-space: nowrap; }
+.measure p { font-size: 15px; font-weight: 500; }
+.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; margin-top: 28px; }
+
+/* Motor */
+.lanes-box { overflow-x: auto; }
+.lanes { display: grid; grid-template-columns: 150px repeat(6, minmax(112px, 1fr)); min-width: 860px; }
+.lanes > div { padding: 13px 11px; border-bottom: 1px solid var(--rule); min-width: 0; }
+.lanes .hd { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--dim); }
+.lanes .hd b { display: block; color: var(--blue-text); }
+.lanes .who { font-family: var(--display); font-weight: 700; font-size: 14.5px; letter-spacing: -0.01em; display: flex; gap: 10px; align-items: center; }
+.lanes .who i { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.lanes .last { border-bottom: none; }
+.step { display: inline-block; font-size: 13px; line-height: 1.35; padding: 6px 10px; border-radius: 8px; font-weight: 500; }
+.c-epc { background: linear-gradient(180deg, var(--blue-hi), var(--blue)); color: #fff; }
+.c-me { background: #F4F5F8; color: #1C1D21; }
+.c-op { background: rgba(202,220,252,.16); color: var(--ice); box-shadow: inset 0 0 0 1px rgba(202,220,252,.3); }
+.c-eld { color: var(--fg); box-shadow: inset 0 0 0 1.4px var(--blue-text); border-radius: 8px; background: transparent; outline: 1px dashed transparent; border: 1px dashed var(--blue-text); box-shadow: none; }
+.c-cm { background: rgba(255,255,255,.06); color: var(--muted); box-shadow: inset 0 0 0 1px var(--border); }
+.d-epc { background: var(--blue-hi); } .d-me { background: #F4F5F8; } .d-op { background: var(--ice); } .d-eld { border: 1.5px dashed var(--blue-text); } .d-cm { background: var(--dim); }
+
+/* Perfil */
+.skills div { display: grid; grid-template-columns: 140px 1fr; gap: 18px; padding: 16px 22px; }
+.skills div + div { border-top: 1px solid var(--rule); }
+.skills b { font-family: var(--display); font-size: 15.5px; letter-spacing: -0.01em; }
+.skills span { color: var(--muted); font-size: 15px; }
+.skills .grow b { color: var(--blue-text); }
+
+/* Indicadores */
+.funnel { display: grid; gap: 10px; padding: 24px; }
+.frow { display: grid; grid-template-columns: 110px 1fr; gap: 14px; align-items: center; }
+.frow .k { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; font-weight: 700; color: var(--dim); }
+.bar { border-radius: 10px; padding: 12px 16px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 14.5px; color: #fff; }
+.bar small { font-size: 12.5px; opacity: .8; }
+.b1 { width: 100%; background: linear-gradient(90deg, #2A63FF, #0242D1); }
+.b2 { width: 88%; background: linear-gradient(90deg, rgba(42,99,255,.75), rgba(2,66,209,.75)); }
+.b3 { width: 76%; background: linear-gradient(90deg, rgba(42,99,255,.5), rgba(2,66,209,.5)); }
+.b4 { width: 64%; background: linear-gradient(90deg, rgba(42,99,255,.3), rgba(2,66,209,.3)); box-shadow: inset 0 0 0 1px rgba(127,164,255,.35); }
+
+/* Plan */
+.stage .num { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 14px; background: linear-gradient(180deg, var(--blue-hi), var(--blue)); box-shadow: 0 6px 16px rgba(2,66,209,.45); }
+.stage:nth-child(2) .num { background: rgba(42,99,255,.35); box-shadow: none; }
+.stage:nth-child(3) .num { background: transparent; box-shadow: inset 0 0 0 1.5px var(--blue-text); color: var(--blue-text); }
+
+/* Pendientes */
+.open { border-style: dashed; background: rgba(255,255,255,.025); box-shadow: none; }
+
+/* Cierre */
+.close { padding-block: 104px; position: relative; overflow: hidden; background: var(--blue); }
+.close::before { background-position: center 40%; opacity: .45; }
+.close p { color: #C3D4FB !important; }
+.close .wrap { position: relative; display: grid; gap: 18px; justify-items: center; text-align: center; }
+.close h2 { font-size: clamp(36px, 5.6vw, 68px); letter-spacing: -0.045em; max-width: 16ch; }
+.close p { color: var(--muted); }
+footer { border-top: 1px solid var(--rule); color: var(--dim); font-size: 13px; padding-block: 22px; }
+
+@media (max-width: 920px) {
+  .split { grid-template-columns: 1fr; gap: 28px; }
+  .head { position: static; }
+  .cards-3 { grid-template-columns: 1fr 1fr; }
+  .sec { padding-block: 64px; }
+}
+@media (max-width: 620px) {
+  .brand span { display: none; }
+  .cards-2, .cards-3, .role-grid { grid-template-columns: 1fr; }
+  .facts { grid-template-columns: 1fr; }
+  .facts div:nth-child(odd) { border-right: none; }
+  .facts div:nth-child(n+2) { border-top: 1px solid var(--rule); }
+  .kv div, .skills div { grid-template-columns: 1fr; gap: 4px; }
+  .frow { grid-template-columns: 1fr; gap: 6px; }
+  .bar { width: 100% !important; }
+  .light { height: 150px; }
+}
+</style>
+
+<nav class="nav band" aria-label="Secciones">
+  <div class="wrap">
+    <div class="brand">Startek <span>· Desarrollo de Negocios</span></div>
+    <ul>
+      <li><a href="#rol">El rol</a></li>
+      <li><a href="#decide">Alcance</a></li>
+      <li><a href="#cliente">Cliente</a></li>
+      <li><a href="#equipo">Equipo</a></li>
+      <li><a href="#epc">EPC</a></li>
+      <li><a href="#eld">ELD</a></li>
+      <li><a href="#motor">Cómo funciona</a></li>
+      <li><a href="#arranque">Arranque</a></li>
+      <li><a href="../index.html">← Volver al hub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero band">
+  <img class="cover-logo" src="logo.png" alt="Startek" width="720" height="172">
+  <div class="wrap">
+    <div class="eyebrow">Startek Argentina · Propuesta de puesto</div>
+    <h1>Gerencia de Desarrollo de Negocios y Marca</h1>
+    <p class="claim">La cara visible de Startek frente a sus próximos clientes.</p>
+    <p class="sub">Genera las oportunidades, abre las puertas, presenta la propuesta y acompaña cada negocio hasta que se firma.</p>
+    <div class="chips"><span class="chip">Argentina</span><span class="chip">Solo clientes nuevos</span><span class="chip">Marca corporativa</span><span class="chip">Equipo: EPC + ELD</span></div>
+    <div class="ctas">
+      <a class="pill" href="#rol">Ver el puesto <svg viewBox="0 0 12 12"><path d="M6 2v8M2.5 6.5L6 10l3.5-3.5"/></svg></a>
+      <a class="pill ghost" href="#equipo">Ver el equipo <svg viewBox="0 0 12 12"><path d="M6 2v8M2.5 6.5L6 10l3.5-3.5"/></svg></a>
+    </div>
+  </div>
+</header>
+
+<section class="sec band" id="rol" aria-labelledby="t-rol">
+  <div class="wrap split">
+    <div class="head">
+      <div class="eyebrow">El puesto en 30 segundos</div>
+      <h2 id="t-rol">Tres verbos explican todo el rol</h2>
+    </div>
+    <div class="cards-3">
+      <article class="glass verb"><span class="k">PASO 1</span><h3>Abre</h3><p>Define a quién salir a buscar y pone en marcha la prospección que lleva adelante el EPC.</p><a class="pill" href="#epc">Ver detalle <svg viewBox="0 0 12 12"><path d="M6 2v8M2.5 6.5L6 10l3.5-3.5"/></svg></a></article>
+      <article class="glass verb"><span class="k">PASO 2</span><h3>Cuenta</h3><p>Diseña cómo se presenta Startek: narrativa, lenguaje visual y alcance de cada propuesta.</p><a class="pill" href="#decide">Ver detalle <svg viewBox="0 0 12 12"><path d="M6 2v8M2.5 6.5L6 10l3.5-3.5"/></svg></a></article>
+      <article class="glass verb"><span class="k">PASO 3</span><h3>Acompaña</h3><p>Sigue cada oportunidad hasta la firma y entrega el cliente nuevo ordenado a la operación.</p><a class="pill" href="#motor">Ver detalle <svg viewBox="0 0 12 12"><path d="M6 2v8M2.5 6.5L6 10l3.5-3.5"/></svg></a></article>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" aria-labelledby="t-why">
+  <div class="wrap split">
+    <div class="head">
+      <div class="eyebrow">Por qué este perfil</div>
+      <h2 id="t-why">Vender desde adentro de la operación</h2>
+    </div>
+    <div class="stack">
+      <div class="glass quote">El cliente le compra a <em>quien sabe cómo se hace</em>, no solo a un vendedor.</div>
+      <div class="cards-3">
+        <div class="glass why-item"><span class="ic"><svg viewBox="0 0 24 24"><path d="M4 19V9l8-5 8 5v10"/><path d="M9 19v-6h6v6"/></svg></span><div><b>Conoce la operación</b><span>Más de 10 años en contact center.</span></div></div>
+        <div class="glass why-item"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span><div><b>Presencia y oratoria</b><span>Explica lo complejo de forma simple.</span></div></div>
+        <div class="glass why-item"><span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18M8 21h8"/></svg></span><div><b>Ya lleva la marca</b><span>Presentaciones e imagen de Startek.</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" aria-labelledby="t-axes">
+  <div class="wrap split">
+    <div class="head">
+      <div class="eyebrow">Responsabilidades</div>
+      <h2 id="t-axes">Seis ejes de trabajo</h2>
+      <p>Los tres primeros son el núcleo del puesto. Los otros tres sostienen que el motor funcione.</p>
+    </div>
+    <div class="cards-3">
+      <article class="glass card axis core"><div class="top"><span class="eyebrow">Eje 1</span><span class="tag">Núcleo</span></div><h3>Generación de oportunidades</h3><ul class="list"><li>Mercado, verticales y cuentas, con el Country Manager y Dirección</li><li>Mensajes, guiones y secuencias del EPC</li><li>Primera conversación con cada prospecto</li></ul></article>
+      <article class="glass card axis core"><div class="top"><span class="eyebrow">Eje 2</span><span class="tag">Núcleo</span></div><h3>Representación y posicionamiento</h3><ul class="list"><li>Voz y cara visible frente a prospectos</li><li>Presencia propia y de marca en LinkedIn</li><li>Casos y datos que generan confianza</li></ul></article>
+      <article class="glass card axis core"><div class="top"><span class="eyebrow">Eje 3</span><span class="tag">Núcleo</span></div><h3>Diseño y presentación de la propuesta</h3><ul class="list"><li>Narrativa, lenguaje visual, formato y alcance</li><li>Integra la solución de Operaciones y las condiciones aprobadas</li><li>Presenta y defiende la propuesta</li></ul></article>
+      <article class="glass card axis"><span class="eyebrow">Eje 4</span><h3>Seguimiento hasta el cierre</h3><ul class="list"><li>Coordina solución, pricing y condiciones</li><li>Acompaña negociación y firma</li><li>Traspaso ordenado a la operación</li></ul></article>
+      <article class="glass card axis"><span class="eyebrow">Eje 5</span><h3>Licitaciones</h3><ul class="list"><li>Detecta y prioriza con Dirección Operativa</li><li>Diseña presentación y narrativa de la oferta</li><li>La carga técnica la lleva el ELD</li></ul></article>
+      <article class="glass card axis"><span class="eyebrow">Eje 6</span><h3>Equipo y pipeline</h3><ul class="list"><li>Lidera, entrena y mide al EPC</li><li>Cartera de oportunidades al día</li><li>Releva competencia y objeciones</li></ul></article>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="decide" aria-labelledby="t-dec">
+  <div class="wrap split">
+    <div class="head">
+      <div class="eyebrow">Alcance de decisión</div>
+      <h2 id="t-dec">Qué define y qué acompaña</h2>
+    </div>
+    <div>
+      <div class="cards-2">
+        <div class="glass card own"><span class="eyebrow">Define</span><h3>Cómo sale Startek al mercado</h3>
+          <div class="drow"><b>Mercado objetivo y cuentas</b><small>validado con el CM</small></div>
+          <div class="drow"><b>Mensajes y secuencias de contacto</b><small>con el EPC</small></div>
+          <div class="drow"><b>Narrativa, lenguaje visual y alcance</b><small>propio</small></div>
+        </div>
+        <div class="glass card"><span class="eyebrow">Aporta y da seguimiento</span><h3>Lo que deciden otras áreas</h3>
+          <div class="drow"><b>Solución operativa</b><small>Dir. Operativa + WFM</small></div>
+          <div class="drow"><b>Pricing y condiciones</b><small>CM / Finanzas</small></div>
+          <div class="drow"><b>Carga técnica de licitaciones</b><small>ELD</small></div>
+          <div class="drow"><b>Firma del contrato</b><small>Country Manager</small></div>
+        </div>
+      </div>
+      <p class="note">Define <b>cómo se presenta</b>. Se asegura de que <b>todo lo demás llegue a tiempo</b>.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="cliente" aria-labelledby="t-cl">
+  <div class="wrap split">
+    <div class="head">
+      <div class="eyebrow">Cliente objetivo</div>
+      <h2 id="t-cl">A quién le hablamos</h2>
+    </div>
+    <div class="cards-2">
+      <div class="glass hook"><span>¿Cuánto te cuesta <mark>realmente</mark> atender a tus clientes?</span><div class="cost"><span>Plata</span><span>Esfuerzo</span><span>Calidad</span><span>Métricas</span></div></div>
+      <div class="glass kv">
+        <div><span class="k">Quién</span><span class="v">Empresas pequeñas con atención telefónica, digital o ambas.</span></div>
+        <div><span class="k">Necesidad</span><span class="v">Bajar el costo de su atención sin perder calidad.</span></div>
+        <div><span class="k">Mensaje</span><span class="v">La escala, la tecnología y la gestión de una operación grande, a un costo que hoy no logran solas.</span></div>
+        <div><span class="k">Dónde</span><span class="v">Argentina. Perú, como posible expansión.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="equipo" aria-labelledby="t-org">
+  <div class="wrap split">
+    <div class="head">
+      <div class="eyebrow">Estructura</div>
+      <h2 id="t-org">Dos incorporaciones para salir al mercado</h2>
+      <p>El EPC reporta al puesto. El ELD reporta a Dirección Operativa y trabaja en conjunto con la gerencia.</p>
+    </div>
+    <div>
+      <div class="glass org-box">
+        <svg class="org" viewBox="0 0 760 380" role="img" aria-label="Organigrama: Country Manager arriba; debajo la Gerencia de Desarrollo de Negocios y Marca y Dirección Operativa con WFM; el EPC reporta a la Gerencia y el ELD a Dirección Operativa, con trabajo conjunto con la Gerencia.">
+          <path class="ln" d="M380 76V112M190 112H570M190 112V146M570 112V146M190 214V286M570 214V286"/>
+          <path class="dash" d="M300 180H460"/>
+          <path class="dash" d="M260 214V250H500V286"/>
+          <rect class="box" x="275" y="20" width="210" height="56" rx="12"/>
+          <text class="t" x="380" y="53" text-anchor="middle">Country Manager</text>
+          <rect class="box me" x="50" y="146" width="280" height="68" rx="12"/>
+          <text class="t" x="190" y="175" text-anchor="middle">Gerencia Des. Negocios y Marca</text>
+          <text class="s me-s" x="190" y="196" text-anchor="middle">Abre, cuenta y acompaña</text>
+          <rect class="box" x="430" y="146" width="280" height="68" rx="12"/>
+          <text class="t" x="570" y="175" text-anchor="middle">Dirección Operativa + WFM</text>
+          <text class="s" x="570" y="196" text-anchor="middle">Define la solución operativa</text>
+          <rect class="box team" x="50" y="286" width="280" height="68" rx="12"/>
+          <text class="t" x="190" y="315" text-anchor="middle">EPC</text>
+          <text class="s" x="190" y="336" text-anchor="middle">Ejecutivo de Prospección Comercial</text>
+          <rect class="box team" x="430" y="286" width="280" height="68" rx="12"/>
+          <text class="t" x="570" y="315" text-anchor="middle">ELD</text>
+          <text class="s" x="570" y="336" text-anchor="middle">Ejecutivo de Licitaciones y Documentación</text>
+          <text class="lbl" x="380" y="242" text-anchor="middle">trabajo conjunto</text>
+        </svg>
+      </div>
+      <div class="legend"><span><i></i>Reporte directo</span><span><i class="d"></i>Trabajo conjunto, sin reporte</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band epc" id="epc" aria-labelledby="t-epc">
+  <div class="wrap split">
+    <div class="head role-head">
+      <div class="acr" aria-hidden="true">EPC</div>
+      <div class="name">Ejecutivo de Prospección Comercial</div>
+      <h2 id="t-epc">Llena la agenda de reuniones con empresas que valen la pena</h2>
+    </div>
+    <div class="stack">
+      <div class="glass facts">
+        <div><span class="k">Reporta a</span><span class="v">Gerencia de Desarrollo de Negocios</span></div>
+        <div><span class="k">Alcance</span><span class="v">Prospecta todo el país</span></div>
+        <div><span class="k">Búsqueda</span><span class="v">Interna: coordinador o agente con buen perfil</span></div>
+        <div><span class="k">Dedicación</span><span class="v">Parcial, sumada a su rol, con plus por la función</span></div>
+      </div>
+      <div class="role-grid" style="margin-top:0">
+        <div class="glass card"><span class="eyebrow">Qué hace</span>
+          <ul class="checks">
+            <li><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span><b>Arma listas</b> de prospectos con la base y el perfil de cliente</span></li>
+            <li><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span><b>Contacta</b> por teléfono, mail y LinkedIn</span></li>
+            <li><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span><b>Califica</b> interés, tamaño y necesidad de bajar costos</span></li>
+            <li><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span><b>Agenda la reunión</b> para la gerencia</span></li>
+            <li><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span><b>Registra todo</b> en la cartera de oportunidades</span></li>
+          </ul>
+        </div>
+        <div class="glass card"><span class="eyebrow">Perfil</span>
+          <ul class="list"><li>Experiencia en ventas telefónicas o atención</li><li>Buena comunicación oral y escrita</li><li>Constancia y tolerancia al "no"</li></ul>
+        </div>
+      </div>
+      <div class="measure"><span class="k">Se mide por</span><p>Contactos y reuniones calificadas por semana.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band eld" id="eld" aria-labelledby="t-eld">
+  <div class="wrap split">
+    <div class="head role-head">
+      <div class="acr" aria-hidden="true">ELD</div>
+      <div class="name">Ejecutivo de Licitaciones y Documentación</div>
+      <h2 id="t-eld">Que cada propuesta llegue completa, en regla y a tiempo</h2>
+    </div>
+    <div class="stack">
+      <div class="glass facts">
+        <div><span class="k">Reporta a</span><span class="v">Dirección Operativa</span></div>
+        <div><span class="k">Trabaja con</span><span class="v">Gerencia, WFM y Finanzas</span></div>
+        <div><span class="k">Búsqueda</span><span class="v">Interna</span></div>
+        <div><span class="k">Dedicación</span><span class="v">Parcial, sumada a su rol, con plus por la función</span></div>
+      </div>
+      <div class="role-grid" style="margin-top:0">
+        <div class="glass card"><span class="eyebrow">Qué hace</span>
+          <ul class="checks">
+            <li><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span><b>Releva licitaciones</b> y oportunidades formales</span></li>
+            <li><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span><b>Arma la documentación técnica</b> de las propuestas, también las de pymes</span></li>
+            <li><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span><b>Mantiene</b> la documentación técnica y legal de la empresa</span></li>
+            <li><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span><b>Carga las ofertas</b> en los portales de compras</span></li>
+            <li><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg><span><b>Controla</b> requisitos y fechas</span></li>
+          </ul>
+        </div>
+        <div class="glass card"><span class="eyebrow">Perfil</span>
+          <ul class="list"><li>Ordenado y detallista</li><li>Experiencia en licitaciones o administración comercial</li><li>Manejo de documentación y plazos</li></ul>
+        </div>
+      </div>
+      <div class="measure"><span class="k">Se mide por</span><p>Licitaciones presentadas en plazo y sin observaciones.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="motor" aria-labelledby="t-mot">
+  <div class="wrap">
+    <div class="head" style="position:static;max-width:640px;margin-bottom:32px">
+      <div class="eyebrow">Cómo funciona</div>
+      <h2 id="t-mot">Del primer llamado a la firma, cada uno sabe qué le toca</h2>
+    </div>
+    <div class="glass lanes-box">
+      <div class="lanes" role="table" aria-label="Quién hace qué en cada etapa">
+        <div class="hd">Quién</div>
+        <div class="hd"><b>1</b>Prospección</div><div class="hd"><b>2</b>Reunión</div><div class="hd"><b>3</b>Solución</div><div class="hd"><b>4</b>Propuesta</div><div class="hd"><b>5</b>Cierre</div><div class="hd"><b>6</b>Traspaso</div>
+
+        <div class="who"><i class="d-epc"></i>EPC</div>
+        <div><span class="step c-epc">Contacta y califica</span></div><div><span class="step c-epc">Agenda</span></div><div></div><div></div><div></div><div></div>
+
+        <div class="who"><i class="d-me"></i>Gerencia</div>
+        <div><span class="step c-me">Define a quién buscar</span></div><div><span class="step c-me">Conduce la conversación</span></div><div><span class="step c-me">Traslada la necesidad</span></div><div><span class="step c-me">Diseña y presenta</span></div><div><span class="step c-me">Da seguimiento</span></div><div><span class="step c-me">Asegura el traspaso</span></div>
+
+        <div class="who"><i class="d-op"></i>Dir. Op. + WFM</div>
+        <div></div><div></div><div><span class="step c-op">Define la solución</span></div><div></div><div></div><div><span class="step c-op">Recibe el cliente</span></div>
+
+        <div class="who"><i class="d-eld"></i>ELD</div>
+        <div></div><div></div><div><span class="step c-eld">Documentación técnica</span></div><div><span class="step c-eld">Carga y controla</span></div><div></div><div></div>
+
+        <div class="who last"><i class="d-cm"></i>CM / Finanzas</div>
+        <div class="last"></div><div class="last"></div><div class="last"></div><div class="last"><span class="step c-cm">Aprueba pricing</span></div><div class="last"><span class="step c-cm">Firma</span></div><div class="last"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" aria-labelledby="t-prof">
+  <div class="wrap split">
+    <div class="head">
+      <div class="eyebrow">Perfil del titular</div>
+      <h2 id="t-prof">Qué trae y qué desarrolla</h2>
+    </div>
+    <div class="glass skills">
+      <div><b>Experiencia</b><span>Más de 10 años en operaciones de contact center: dimensionamiento, KPIs y gestión de equipos.</span></div>
+      <div><b>Comunicación</b><span>Oratoria, presencia ejecutiva y capacidad de explicar lo complejo de forma simple.</span></div>
+      <div><b>Comercial</b><span>Orientación a abrir puertas, construir relaciones y sostener el seguimiento.</span></div>
+      <div><b>Liderazgo</b><span>Capacidad de formar y medir a un perfil junior de prospección.</span></div>
+      <div class="grow"><b>A desarrollar</b><span>Técnicas de negociación y prospección B2B. Seguimiento de la cartera de oportunidades.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" aria-labelledby="t-kpi">
+  <div class="wrap split">
+    <div class="head">
+      <div class="eyebrow">Indicadores</div>
+      <h2 id="t-kpi">Primero medimos, después fijamos metas</h2>
+      <p>Sin metas al inicio: los primeros meses construyen la línea de base.</p>
+    </div>
+    <div class="stack">
+      <div class="glass funnel">
+        <div class="frow"><span class="k">Actividad</span><div class="bar b1"><span>Contactos y reuniones calificadas por semana</span><small>EPC</small></div></div>
+        <div class="frow"><span class="k">Conversión</span><div class="bar b2"><span>Reuniones que pasan a propuesta · cierre</span><small>Gerencia</small></div></div>
+        <div class="frow"><span class="k">Velocidad</span><div class="bar b3"><span>Días de reunión a propuesta</span><small>Gerencia + Dir. Op.</small></div></div>
+        <div class="frow"><span class="k">Resultado</span><div class="bar b4"><span>Clientes nuevos y facturación</span><small>Gerencia</small></div></div>
+      </div>
+      <div class="cards-2">
+        <div class="glass card"><span class="eyebrow">Licitaciones</span><p>Presentadas y adjudicadas · ELD con la gerencia</p></div>
+        <div class="glass card"><span class="eyebrow">Marca</span><p>Presencia en eventos y alcance en LinkedIn</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" id="arranque" aria-labelledby="t-plan">
+  <div class="wrap split">
+    <div class="head">
+      <div class="eyebrow">Plan de arranque</div>
+      <h2 id="t-plan">Salimos al mercado mientras armamos el equipo</h2>
+    </div>
+    <div class="cards-3">
+      <article class="glass card stage"><span class="num">1</span><h3>Base y primeros contactos</h3><ul class="list"><li>Propuesta de valor</li><li>Presentación base y versión corta</li><li>Primeras 50 a 100 empresas objetivo</li><li>Contacto directo y LinkedIn</li><li>Perfiles de EPC y ELD con RR. HH.</li></ul></article>
+      <article class="glass card stage"><span class="num">2</span><h3>En marcha</h3><ul class="list"><li>Incorporar y entrenar al EPC</li><li>Circuito estándar para cotizar</li><li>Cartera de oportunidades compartida</li><li>Primeras reuniones y propuestas</li></ul></article>
+      <article class="glass card stage"><span class="num">3</span><h3>Ajuste y resultados</h3><ul class="list"><li>Línea de base de indicadores</li><li>Ajuste de mensajes y verticales</li><li>Primer informe y propuesta de metas</li></ul></article>
+    </div>
+  </div>
+</section>
+
+<section class="sec band" aria-labelledby="t-todo">
+  <div class="wrap split">
+    <div class="head">
+      <div class="eyebrow">Para definir juntos</div>
+      <h2 id="t-todo">Cuatro decisiones abiertas</h2>
+    </div>
+    <div class="cards-2">
+      <div class="glass card open"><span class="eyebrow">Abierta 1</span><h3>Tamaño del cliente</h3><p>Rango de posiciones que define a una "empresa pequeña".</p></div>
+      <div class="glass card open"><span class="eyebrow">Abierta 2</span><h3>Herramienta de seguimiento</h3><p>Arrancamos con un Excel compartido; CRM a definir.</p></div>
+      <div class="glass card open"><span class="eyebrow">Abierta 3</span><h3>Circuito de cotización</h3><p>Plazo de respuesta con Dirección Operativa, WFM y Finanzas.</p></div>
+      <div class="glass card open"><span class="eyebrow">Abierta 4</span><h3>Áreas regionales y globales</h3><p>Cómo nos articulamos con los equipos comerciales de Startek.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="close band" aria-labelledby="t-close">
+  <div class="wrap">
+    <h2 id="t-close">Startek ya sabe operar. Ahora sale a contarlo.</h2>
+    <p>Gerencia de Desarrollo de Negocios y Marca · Startek Argentina</p>
+  </div>
+</section>
+<footer class="band"><div class="wrap">Documento interno · Propuesta de puesto · Noviembre 2026</div></footer>
+
+</body></html>
