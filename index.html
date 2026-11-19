@@ -12,6 +12,27 @@ a{color:#111111}a:hover{color:#000000}
 a.tile:hover{outline:2px solid #111111;outline-offset:-2px}
 a.cta:hover{background:#333333 !important}
 </style>
+<style>
+dialog.intro{border:0;padding:0;max-width:740px;width:calc(100% - 32px);background:#FFFFFF;color:#111111;box-shadow:0 24px 64px rgba(0,0,0,.35);overflow:visible}
+dialog.intro::backdrop{background:rgba(17,17,17,.6)}
+.intro-in{display:grid;grid-template-columns:260px 1fr;align-items:end;font-family:'DM Sans',sans-serif}
+.intro-ph{position:relative;align-self:stretch;background:#111111;overflow:visible}
+.intro-ph img{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:260px;max-width:none;height:auto;display:block}
+.intro-tx{padding:36px 36px 32px;display:flex;flex-direction:column;gap:14px}
+.intro-tx .ey{font-size:13px;font-weight:700;color:#5E5E5E}
+.intro-tx h2{margin:0;font-family:'Open Sans',sans-serif;font-weight:800;font-size:26px;line-height:1.15;letter-spacing:-.02em}
+.intro-tx p{margin:0;font-size:16px;line-height:1.55;color:#333333}
+.intro-tx strong{color:#111111}
+.intro-act{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.intro-act a,.intro-act button{font-family:'Open Sans',sans-serif;font-weight:800;font-size:15px;min-height:48px;padding:12px 20px;box-sizing:border-box;display:inline-flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
+.intro-act a{background:#111111;color:#FFFFFF;border:1px solid #111111}
+.intro-act a:hover{background:#333333}
+.intro-act button{background:#FFFFFF;color:#111111;border:1px solid #111111}
+.intro-act button:hover{background:#F2F2F2}
+.intro-x{position:absolute;top:10px;right:10px;width:44px;height:44px;border:0;background:transparent;color:#111111;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.intro-x:hover{background:#F2F2F2}
+@media (max-width:560px){.intro-in{grid-template-columns:1fr}.intro-ph{height:170px}.intro-ph img{width:170px}.intro-tx{padding:28px 22px 24px}}
+</style>
 </head>
 <body>
 <div style="font-family: 'DM Sans', sans-serif; color: #111111; background: #FFFFFF; min-height: 100vh">
@@ -99,5 +120,35 @@ a.cta:hover{background:#333333 !important}
 
 </div>
 </div>
+
+<dialog class="intro" id="intro" aria-labelledby="intro-t">
+<button class="intro-x" type="button" aria-label="Cerrar" data-close><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<div class="intro-in">
+<div class="intro-ph"><img src="lucas.webp" alt="Lucas Sánchez Tort" width="560" height="613"></div>
+<div class="intro-tx">
+<span class="ey">Cómo leer esta landing</span>
+<h2 id="intro-t">Un vistazo rápido al proyecto</h2>
+<p>Acá vas a encontrar las <strong>tareas y los ejes principales</strong> de la Gerencia. Cada tarjeta muestra su status, su responsable y sus tareas; las que tienen “Ver resumen” abren el detalle.</p>
+<p>Si querés la historia completa, mirá la presentación en el botón <strong>“Ver presentación de la Gerencia”</strong>.</p>
+<div class="intro-act">
+<a href="presentacion/index.html">Ver presentación<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<button type="button" data-close autofocus>Ver la landing</button>
+</div>
+</div>
+</div>
+</dialog>
+<script>
+(function(){
+  var d=document.getElementById('intro'); if(!d||!d.showModal) return;
+  var seen=false; try{seen=sessionStorage.getItem('introVista')==='1';}catch(e){}
+  if(seen) return;
+  d.showModal();
+  function close(){ d.close(); try{sessionStorage.setItem('introVista','1');}catch(e){} }
+  d.querySelectorAll('[data-close]').forEach(function(b){b.addEventListener('click',close);});
+  d.addEventListener('cancel',function(){ try{sessionStorage.setItem('introVista','1');}catch(e){} });
+  d.addEventListener('click',function(e){ if(e.target===d) close(); });
+  d.querySelector('a').addEventListener('click',function(){ try{sessionStorage.setItem('introVista','1');}catch(e){} });
+})();
+</script>
 </body>
 </html>
