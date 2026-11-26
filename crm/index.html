@@ -152,6 +152,8 @@ textarea{min-height:90px;resize:vertical}
 .note{font-size:13px;color:var(--mute);margin:0}
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 18px;border-radius:16px;z-index:30;font-size:14px;max-width:90vw}
 .toast[hidden]{display:none}
+.demobar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;background:var(--amberbg);color:var(--amber);border-radius:20px;padding:12px 14px 12px 20px;margin-bottom:16px;font-weight:500}
+.demobar:empty{display:none}.demobar .btn{background:var(--card);color:var(--ink);min-height:40px}
 body.locked .app{display:none}body:not(.locked) .login{display:none}
 @media(max-width:1180px){.dash{grid-template-columns:1fr}.hero{min-height:0}.gauge{max-width:420px;margin-inline:auto -26px}}
 @media(max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.duo{grid-template-columns:1fr}.lh{display:none}.row{grid-template-columns:90px minmax(0,1fr) auto}.row>:nth-child(n+4){display:none}}
@@ -197,6 +199,7 @@ body.locked .app{display:none}body:not(.locked) .login{display:none}
     </header>
 
     <section id="v-dashboard">
+      <div class="demobar" id="demoBar" role="status"></div>
       <div class="dash">
         <div class="hero">
           <button class="corner" id="toAgenda" aria-label="Ver agenda"></button>
@@ -326,6 +329,7 @@ function leave(){document.body.classList.add("locked");items=[];closeFicha();if(
 function log(p,tipo,detalle,extra={}){p.historial=p.historial||[];p.historial.push({id:uid(),fecha:hoy(),ts:Date.now(),tipo,detalle,...extra})}
 const toques=p=>(p.historial||[]).filter(h=>h.tipo!=="Sistema");
 function ultimo(p){const t=toques(p);if(!t.length)return null;const f=t.map(h=>h.fecha).sort().pop();return Math.round((new Date(hoy())-new Date(f))/864e5)}
+const esDemo=p=>!!p.demo||/^Ejemplo · /.test(p.empresa||"");
 const cerrado=p=>["ganado","perdido"].includes(p.etapa);
 const estado=p=>!p.proxFecha||cerrado(p)?"":p.proxFecha<hoy()?"late":p.proxFecha===hoy()?"today":"";
 
@@ -351,6 +355,8 @@ function filtered(){
   return items.filter(p=>(!pr||p.prioridad===pr)&&(!rs||p.responsable===rs)&&(!dayF||p.proxFecha===dayF&&!cerrado(p))&&(!kf||kf[2](p))&&(!q||[p.empresa,p.contacto,p.rubro,p.ciudad,p.cargo].join(" ").toLowerCase().includes(q)));
 }
 function renderTop(){
+  const nd=items.filter(esDemo).length;
+  $("#demoBar").innerHTML=nd?`<span>Estás viendo ${nd} prospecto${nd>1?"s":""} de ejemplo. Borralos para quedarte solo con los datos reales.</span><button class="btn" id="clearDemo">${svg("x",16)}Borrar datos de ejemplo</button>`:"";
   const act=items.filter(p=>!cerrado(p)),n=act.length;
   const adv=act.filter(p=>["dimensionamiento","propuesta","negociacion"].includes(p.etapa)).length,pct=n?Math.round(adv/n*100):0;
   $("#legend").innerHTML=[["Alta","#FF8A8E"],["Media","#FFC56B"],["Baja","#7BE0A6"]].map(([k,c])=>`<div><i style="background:${c}"></i>${k}<b>${act.filter(p=>p.prioridad===k).length}</b></div>`).join("");
@@ -436,6 +442,7 @@ $("#v-dashboard").addEventListener("click",e=>{
   const d=e.target.closest("[data-day]");if(d){dayF=dayF===d.dataset.day?"":d.dataset.day;if(dayF&&view==="kanban")return setView("lista");return render()}
   const c=e.target.closest("[data-clear]");if(c){if(c.dataset.clear==="day")dayF="";else kpiF="";return render()}
   if(e.target.closest("#demo"))return demo();
+  if(e.target.closest("#clearDemo")){const ds=items.filter(esDemo);ds.forEach(p=>remove(p.id));if(openId&&ds.some(p=>p.id===openId))closeFicha();return toast(`Listo: se borraron ${ds.length} prospectos de ejemplo`)}
   if(e.target.closest("#csv"))return copyCSV();
   const t=e.target.closest("#board [data-id]");if(t)openFicha(t.dataset.id)});
 $("#board").addEventListener("keydown",e=>{const c=e.target.closest("[data-id]");if(c&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openFicha(c.dataset.id)}});
@@ -480,7 +487,7 @@ function demo(){const d=n=>{const x=new Date();x.setDate(x.getDate()+n);return i
    ["Ejemplo · Seguros Andinos","Paula Ferrer","Jefa de Atención","Seguros","Mendoza","propuesta","Alta","Seguimiento de propuesta",d(3),"Propuesta","Enviada propuesta omnicanal"],
    ["Ejemplo · Fintech Pampa","","","Fintech","Córdoba","identificado","Baja","Primer llamado",d(2),"",""]]
   .forEach(([empresa,contacto,cargo,rubro,ciudad,etapa,prioridad,proxAccion,proxFecha,tipo,det])=>{
-    const p={id:uid(),creado:Date.now(),empresa,contacto,cargo,rubro,ciudad,etapa,prioridad,proxAccion,proxFecha,origen:"Base de datos",responsable:"EPC",historial:[]};
+    const p={id:uid(),creado:Date.now(),empresa,contacto,cargo,rubro,ciudad,etapa,prioridad,proxAccion,proxFecha,origen:"Base de datos",responsable:"EPC",demo:true,historial:[]};
     log(p,"Sistema","Alta (dato de ejemplo)");if(tipo)log(p,tipo,det);save(p)});toast("Datos de ejemplo cargados: borralos desde cada ficha")}
 route();
 }
