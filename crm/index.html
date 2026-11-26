@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CRM Nuevos Negocios</title>
+<meta name="robots" content="noindex,nofollow">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Open+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: herramienta de trabajo diaria, clara y rápida, sin adornos.
+   IDEA: tablero de pipeline + legajo de cada prospecto (hoja de vida).
+   PICTURE: el tablero kanban mismo, con tarjetas vivas.
+   COLOUR and TYPE: azul Startek #0242D1 dominante, blanco, rojo solo para vencidos; Open Sans títulos, DM Sans texto.
+   LAYOUT: banda azul con navegación, KPIs en una fila, tablero a lo ancho; ficha como panel lateral. */
+:root{color-scheme:light dark;
+--bg:light-dark(#f3f5fa,#0a0f1d);--panel:light-dark(#fff,#121a2d);--ink:light-dark(#0d1530,#e8ecf7);
+--mute:light-dark(#5b6680,#98a2bc);--line:light-dark(#e0e5ef,#25304b);--soft:light-dark(#eaf0ff,#17244a);
+--blue:#0242D1;--bink:light-dark(#0242D1,#6f9bff);--red:light-dark(#d4373c,#ff6b6f);--green:light-dark(#11894a,#3ccf7f);--amber:light-dark(#b86e00,#f2b14a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "DM Sans",system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Open Sans",system-ui,sans-serif;font-weight:700;margin:0;line-height:1.1}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--bink);outline-offset:2px}
+.top{background:var(--blue);color:#fff;padding:14px max(4vw,16px) 0}
+.top-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.top h1{font-size:22px;font-weight:800}.top h1 small{display:block;font:500 13px "DM Sans";opacity:.8;margin-top:3px}
+.status{font-size:13px;background:rgba(255,255,255,.14);border-radius:99px;padding:5px 12px}
+nav{display:flex;gap:4px;margin-top:14px}
+nav a{color:#fff;text-decoration:none;padding:12px 18px;border-radius:10px 10px 0 0;font-weight:600;opacity:.8}
+nav a.on{background:var(--bg);color:var(--ink);opacity:1}
+main{padding:22px max(4vw,16px) 48px;max-width:1600px;margin:0 auto}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi b{display:block;font:800 clamp(26px,3vw,34px)/1 "Open Sans";margin:6px 0 2px}
+.kpi span{font-size:13px;color:var(--mute)}.kpi.alert b{color:var(--red)}.kpi.ok b{color:var(--green)}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.in,select,textarea{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;min-height:44px;font-size:16px;width:100%}
+textarea{min-height:84px;resize:vertical}
+.bar .in{flex:1 1 220px;width:auto}.bar select{width:auto;flex:0 1 auto}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:none;padding:10px 14px;min-height:44px}.seg button.on{background:var(--blue);color:#fff}
+.btn{border:0;border-radius:10px;padding:10px 18px;min-height:44px;font-weight:600;background:var(--blue);color:#fff}
+.btn.ghost{background:var(--soft);color:var(--bink)}.btn.danger{background:none;color:var(--red);border:1px solid var(--red)}
+.board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(270px,1fr);gap:12px;overflow-x:auto;padding-bottom:10px;scroll-snap-type:x proximity}
+.col{background:light-dark(#e9edf6,#0f1628);border-radius:14px;padding:10px;min-height:300px;scroll-snap-align:start;display:flex;flex-direction:column;gap:8px}
+.col.over{outline:2px dashed var(--bink)}
+.col h3{font-size:14px;display:flex;justify-content:space-between;padding:4px 6px 6px}
+.col h3 i{font-style:normal;color:var(--mute);font-weight:600}
+.col.ganado h3{color:var(--green)}.col.perdido h3{color:var(--mute)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;text-align:left;width:100%;display:block}
+.card:hover{border-color:var(--bink)}.card.drag{opacity:.4}
+.card b{font-size:15px;display:flex;gap:8px;align-items:center}
+.dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--mute)}.dot.Alta{background:var(--red)}.dot.Media{background:var(--amber)}.dot.Baja{background:var(--green)}
+.sub{font-size:13px;color:var(--mute);margin-top:2px}
+.next{font-size:13px;margin-top:8px;padding:6px 8px;border-radius:8px;background:var(--soft)}
+.next.late{background:light-dark(#fde8e8,#3a1517);color:var(--red)}.next.today{background:light-dark(#fff3dc,#3a2a0e);color:var(--amber)}
+.foot{font-size:12px;color:var(--mute);margin-top:8px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.empty{background:var(--panel);border:1px dashed var(--line);border-radius:14px;padding:40px 20px;text-align:center}
+.empty p{color:var(--mute);max-width:46ch;margin:8px auto 18px}
+table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:14px;overflow:hidden}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}
+th{font-size:13px;color:var(--mute);font-weight:600}tbody tr{cursor:pointer}tbody tr:hover{background:var(--soft)}
+.pill{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:99px;background:var(--soft);color:var(--bink);white-space:nowrap}
+.form{max-width:860px}
+.form h2{font-size:30px;margin-bottom:6px}.lead{color:var(--mute);margin:0 0 22px}
+fieldset{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:16px 18px 18px;margin:0 0 16px}
+legend{font:700 15px "Open Sans";padding:0 6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:12px}
+label{display:block;font-size:13px;font-weight:600;color:var(--mute)}label .in,label select,label textarea{margin-top:5px;color:var(--ink);font-weight:400}
+.full{grid-column:1/-1}
+.drawer{position:fixed;inset:0;background:rgba(5,10,25,.45);display:flex;justify-content:flex-end;z-index:20}
+.drawer[hidden]{display:none}
+.panel{background:var(--bg);width:min(620px,100%);height:100%;overflow-y:auto;box-shadow:-10px 0 40px rgba(0,0,0,.2);animation:in .22s ease-out}
+@keyframes in{from{transform:translateX(30px);opacity:0}}
+@media(prefers-reduced-motion:reduce){.panel{animation:none}}
+.ph{background:var(--blue);color:#fff;padding:20px 22px;position:sticky;top:0;z-index:2}
+.ph h2{font-size:clamp(22px,3vw,28px)}.ph p{margin:4px 0 0;opacity:.85;font-size:14px}
+.x{position:absolute;right:12px;top:12px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.15);color:#fff;font-size:22px}
+.pb{padding:18px 22px 40px;display:grid;gap:16px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.chips label{margin:0}.chips input{position:absolute;opacity:0}
+.chips span{display:inline-block;padding:8px 13px;border-radius:99px;border:1px solid var(--line);background:var(--panel);font-weight:500;color:var(--ink);min-height:38px}
+.chips input:checked+span{background:var(--blue);color:#fff;border-color:var(--blue)}.chips input:focus-visible+span{outline:3px solid var(--bink)}
+.tl{list-style:none;margin:0;padding:0 0 0 18px;border-left:2px solid var(--line)}
+.tl li{position:relative;padding:0 0 16px 14px}
+.tl li::before{content:"";position:absolute;left:-25px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--blue);border:2px solid var(--bg)}
+.tl li.sys::before{background:var(--mute)}.tl li.sys{color:var(--mute);font-size:14px}
+.tl .when{font-size:12px;color:var(--mute);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tl .res{font-size:14px;margin-top:3px;color:var(--mute)}
+.tl .del{border:0;background:none;color:var(--mute);font-size:12px;margin-left:auto;padding:4px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;z-index:30;font-size:14px}
+.toast[hidden]{display:none}
+.note{font-size:13px;color:var(--mute)}
+.login{max-width:420px;margin:6vh auto;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px;display:grid;gap:14px}
+.login h2{font-size:26px}.err{color:var(--red);font-size:14px;min-height:1.2em;margin:0}
+.who{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.out{border:1px solid rgba(255,255,255,.5);background:none;color:#fff;border-radius:99px;padding:5px 12px;font-size:13px;min-height:32px}
+.out[hidden]{display:none}
+body.locked nav,body.locked #v-dashboard,body.locked #v-carga{display:none}
+body:not(.locked) #v-login{display:none}
+@media(max-width:600px){.row2{grid-template-columns:1fr}.board{grid-auto-columns:86%;scroll-snap-type:x mandatory}nav a{padding:10px 12px}
+table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 12px;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;color:var(--mute)}.stack td:empty{display:none}}
+</style>
+<script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
+</head>
+<body class="locked">
+<header class="top">
+  <div class="top-row">
+    <h1>Pipeline Nuevos Negocios<small>Startek Argentina · Desarrollo de Negocios</small></h1>
+    <div class="who"><span class="status" id="status">Conectando…</span><button class="out" id="logout" hidden>Salir</button></div>
+  </div>
+  <nav><a href="#dashboard" id="nav-dashboard">Dashboard</a><a href="#carga" id="nav-carga">+ Cargar prospecto</a></nav>
+</header>
+
+<main>
+  <section id="v-login">
+    <form class="login" id="fLogin" novalidate>
+      <h2>Ingresar</h2>
+      <p class="note">Acceso solo para el equipo de Desarrollo de Negocios. Si no tenés usuario, pedíselo a Lucas.</p>
+      <label>Email<input class="in" type="email" name="email" autocomplete="username" required></label>
+      <label>Contraseña<input class="in" type="password" name="password" autocomplete="current-password" required></label>
+      <p class="err" id="loginErr" role="alert"></p>
+      <button class="btn">Entrar</button>
+    </form>
+  </section>
+
+  <section id="v-dashboard">
+    <div class="kpis" id="kpis"></div>
+    <div class="bar">
+      <input class="in" id="q" type="search" placeholder="Buscar empresa, contacto, rubro, ciudad…" aria-label="Buscar">
+      <select id="fPri" aria-label="Prioridad"><option value="">Toda prioridad</option><option>Alta</option><option>Media</option><option>Baja</option></select>
+      <select id="fResp" aria-label="Responsable"><option value="">Todo responsable</option></select>
+      <div class="seg" role="group" aria-label="Vista"><button id="vk" class="on">Tablero</button><button id="vl">Agenda</button></div>
+    </div>
+    <div id="board"></div>
+  </section>
+
+  <section id="v-carga" class="form" hidden>
+    <h2>Cargar prospecto</h2>
+    <p class="lead">Cada alta genera su tarjeta y su hoja de vida. Solo la empresa es obligatoria; el resto se completa sobre la marcha.</p>
+    <form id="fAlta" novalidate>
+      <fieldset><legend>Empresa</legend><div class="grid" id="gEmpresa"></div></fieldset>
+      <fieldset><legend>Contacto</legend><div class="grid" id="gContacto"></div></fieldset>
+      <fieldset><legend>Calificación</legend><div class="grid" id="gCalif"></div></fieldset>
+      <fieldset><legend>Primer punto de contacto (opcional)</legend>
+        <div class="chips" id="altaTipos"></div>
+        <div class="grid">
+          <label class="full">Qué se hizo<textarea name="h_detalle" placeholder="Ej.: llamada en frío, habló con recepción, pidió info por mail"></textarea></label>
+          <label>Próxima acción<input class="in" name="proxAccion" placeholder="Ej.: enviar presentación corta"></label>
+          <label>Fecha próxima acción<input class="in" type="date" name="proxFecha"></label>
+        </div>
+      </fieldset>
+      <div class="bar"><button class="btn" type="submit">Guardar y abrir ficha</button><button class="btn ghost" type="reset">Limpiar</button></div>
+    </form>
+  </section>
+</main>
+
+<div class="drawer" id="drawer" hidden><div class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="fichaTitle"></div></div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+{
+const ETAPAS=[["identificado","Identificado"],["contactado","Contactado"],["conversacion","En conversación"],["dimensionamiento","Reunión / Dimensionamiento"],["propuesta","Propuesta enviada"],["negociacion","Negociación"],["ganado","Ganado"],["perdido","Perdido"]];
+const ETQ=Object.fromEntries(ETAPAS);
+const TIPOS=["Llamada","Mail","LinkedIn","WhatsApp","Reunión","Propuesta","Nota"];
+const ORIGENES=["","Base de datos","LinkedIn","Agente de prospección","Referido","Web / inbound","Evento","Licitación"];
+const F={
+  gEmpresa:[["empresa","Empresa *","text"],["rubro","Rubro / vertical","text"],["ciudad","Ciudad / provincia","text"],["tamano","Tamaño","select",["","Micro (<10)","Pequeña (10-50)","Mediana (50-200)","Grande (200+)"]],["web","Sitio web","url"]],
+  gContacto:[["contacto","Nombre y apellido","text"],["cargo","Cargo","text"],["email","Email","email"],["telefono","Teléfono","tel"],["linkedin","LinkedIn (URL)","url"]],
+  gCalif:[["etapa","Etapa inicial","select",ETAPAS.map(e=>e[0])],["prioridad","Prioridad","select",["Media","Alta","Baja"]],["canal","Atención actual","select",["","Sin atención","Interna","Tercerizada","Mixta"]],["origen","Origen","select",ORIGENES],["responsable","Responsable","text"],["notas","Necesidad detectada / notas","textarea"]]
+};
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const hoy=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)};
+const fdate=s=>s?s.slice(8,10)+"/"+s.slice(5,7):"";
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const clone=o=>JSON.parse(JSON.stringify(o));
+let SB=null,items=[],view="kanban",openId=null,dragId=null;
+const chains={};
+
+function field([k,l,t,opts],v=""){
+  const lab=k==="etapa"?(x=>ETQ[x]):(x=>x||"—");
+  if(t==="select")return `<label>${esc(l)}<select name="${k}">${opts.map(o=>`<option value="${esc(o)}"${o===v?" selected":""}>${esc(lab(o))}</option>`).join("")}</select></label>`;
+  if(t==="textarea")return `<label class="full">${esc(l)}<textarea name="${k}">${esc(v)}</textarea></label>`;
+  return `<label>${esc(l)}<input class="in" type="${t}" name="${k}" value="${esc(v)}"${k==="responsable"?' list="resps"':""}></label>`;
+}
+const chips=(name,sel)=>TIPOS.map(t=>`<label><input type="radio" name="${name}" value="${t}"${t===sel?" checked":""}><span>${t}</span></label>`).join("");
+for(const g in F)$("#"+g).innerHTML=F[g].map(f=>field(f)).join("");
+$("#altaTipos").innerHTML=chips("h_tipo","Llamada");
+document.body.insertAdjacentHTML("beforeend",'<datalist id="resps"><option value="Lucas"><option value="EPC"></datalist>');
+
+/* ---------- datos ---------- */
+function setStatus(t){$("#status").textContent=t}
+function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600)}
+function get(id){const p=items.find(x=>x.id===id);return p?clone(p):null}
+const run=(id,fn)=>chains[id]=(chains[id]||Promise.resolve()).then(fn).then(r=>{if(r&&r.error)throw r.error}).catch(e=>{console.error(e);toast("No se pudo guardar en la base. Revisá la conexión y reintentá.");loadAll()});
+function save(p){
+  p.actualizado=Date.now();
+  const i=items.findIndex(x=>x.id===p.id);if(i<0)items.push(p);else items[i]=p;
+  render();
+  const body=clone(p);delete body.id;
+  run(p.id,()=>SB.from("prospectos").upsert({id:p.id,data:body,updated_at:new Date().toISOString()}));
+}
+function remove(id){items=items.filter(x=>x.id!==id);render();run(id,()=>SB.from("prospectos").delete().eq("id",id))}
+async function loadAll(){
+  const {data,error}=await SB.from("prospectos").select("id,data");
+  if(error){setStatus("Sin acceso a la base");toast("Tu usuario no tiene acceso al CRM. Pedile a Lucas que te habilite.");return}
+  items=data.map(r=>({...r.data,id:r.id}));setStatus("Sincronizado");render();
+}
+let live=null,reloadT=null;
+async function enter(session){
+  document.body.classList.remove("locked");$("#logout").hidden=false;
+  setStatus(session.user.email);route();await loadAll();
+  if(!live)live=SB.channel("prospectos").on("postgres_changes",{event:"*",schema:"public",table:"prospectos"},()=>{clearTimeout(reloadT);reloadT=setTimeout(loadAll,400)}).subscribe();
+}
+function leave(){document.body.classList.add("locked");$("#logout").hidden=true;items=[];closeFicha();
+  if(live){SB.removeChannel(live);live=null}setStatus("Sin sesión");render()}
+function log(p,tipo,detalle,extra={}){p.historial=p.historial||[];p.historial.push({id:uid(),fecha:hoy(),ts:Date.now(),tipo,detalle,...extra})}
+const toques=p=>(p.historial||[]).filter(h=>h.tipo!=="Sistema");
+function ultimo(p){const t=toques(p);if(!t.length)return null;const f=t.map(h=>h.fecha).sort().pop();return Math.round((new Date(hoy())-new Date(f))/864e5)}
+const estado=p=>!p.proxFecha||["ganado","perdido"].includes(p.etapa)?"":p.proxFecha<hoy()?"late":p.proxFecha===hoy()?"today":"";
+
+{const C=window.CRM_CONFIG||{};
+ if(!window.supabase||!C.url||!C.anonKey||C.url.includes("PEGAR")){setStatus("Falta configurar la base");$("#fLogin").innerHTML='<h2>CRM sin configurar</h2><p class="note">Falta completar crm/config.js con la URL y la clave pública del proyecto de Supabase.</p>'}
+ else{
+  SB=supabase.createClient(C.url,C.anonKey);
+  SB.auth.getSession().then(({data})=>data.session?enter(data.session):leave());
+  SB.auth.onAuthStateChange((ev,s)=>{if(ev==="SIGNED_OUT")leave()});
+  $("#fLogin").addEventListener("submit",async e=>{e.preventDefault();const f=e.target,b=f.querySelector("button");
+    $("#loginErr").textContent="";b.disabled=true;b.textContent="Entrando…";
+    const {data,error}=await SB.auth.signInWithPassword({email:f.email.value.trim(),password:f.password.value});
+    b.disabled=false;b.textContent="Entrar";
+    if(error){$("#loginErr").textContent="Email o contraseña incorrectos.";return}
+    f.reset();enter(data.session)});
+  $("#logout").onclick=()=>SB.auth.signOut();
+ }}
+
+/* ---------- vistas ---------- */
+function filtered(){
+  const q=$("#q").value.trim().toLowerCase(),pr=$("#fPri").value,rs=$("#fResp").value;
+  return items.filter(p=>(!pr||p.prioridad===pr)&&(!rs||p.responsable===rs)&&(!q||[p.empresa,p.contacto,p.rubro,p.ciudad,p.cargo].join(" ").toLowerCase().includes(q)));
+}
+function renderKPIs(){
+  const act=items.filter(p=>!["ganado","perdido"].includes(p.etapa));
+  const k=[["Prospectos activos",act.length,""],["Acciones vencidas",act.filter(p=>estado(p)==="late").length,"alert"],["Para hoy",act.filter(p=>estado(p)==="today").length,""],
+    ["Propuestas en curso",items.filter(p=>["propuesta","negociacion"].includes(p.etapa)).length,""],["Ganados",items.filter(p=>p.etapa==="ganado").length,"ok"]];
+  $("#kpis").innerHTML=k.map(([l,n,c])=>`<div class="kpi ${n?c:""}"><span>${l}</span><b>${n}</b></div>`).join("");
+  const r=[...new Set(items.map(p=>p.responsable).filter(Boolean))].sort(),cur=$("#fResp").value;
+  $("#fResp").innerHTML='<option value="">Todo responsable</option>'+r.map(x=>`<option${x===cur?" selected":""}>${esc(x)}</option>`).join("");
+}
+function card(p){
+  const d=ultimo(p),st=estado(p);
+  return `<article class="card" draggable="true" data-id="${esc(p.id)}" tabindex="0">
+    <b><span class="dot ${esc(p.prioridad)}" title="Prioridad ${esc(p.prioridad)}"></span>${esc(p.empresa)}</b>
+    <div class="sub">${esc([p.contacto,p.cargo].filter(Boolean).join(" · ")||"Sin contacto cargado")}</div>
+    ${p.rubro||p.ciudad?`<div class="sub">${esc([p.rubro,p.ciudad].filter(Boolean).join(" · "))}</div>`:""}
+    ${p.proxAccion||p.proxFecha?`<div class="next ${st}">${st==="late"?"Vencida: ":st==="today"?"Hoy: ":"Próx.: "}${esc(p.proxAccion||"acción sin definir")} ${p.proxFecha?"· "+fdate(p.proxFecha):""}</div>`:""}
+    <div class="foot"><span>${toques(p).length} toques${d!==null?` · último hace ${d} d`:""}</span><span>${esc(p.responsable)}</span></div></article>`;
+}
+function render(){
+  renderKPIs();
+  const list=filtered(),b=$("#board");
+  if(!items.length){b.innerHTML=`<div class="empty"><h3>Todavía no hay prospectos</h3><p>Cargá el primero y su tarjeta aparece acá, en la etapa que corresponda. Si querés ver cómo se ve con movimiento, cargá datos de ejemplo y borralos después.</p><a class="btn" href="#carga" style="text-decoration:none;display:inline-block">Cargar prospecto</a> <button class="btn ghost" id="demo">Ver con datos de ejemplo</button></div>`}
+  else if(view==="kanban"){
+    b.innerHTML=`<div class="board">${ETAPAS.map(([k,l])=>{const c=list.filter(p=>(p.etapa||"identificado")===k).sort((a,z)=>(a.proxFecha||"9").localeCompare(z.proxFecha||"9"));
+      return `<div class="col ${k}" data-etapa="${k}"><h3>${l}<i>${c.length}</i></h3>${c.map(card).join("")}</div>`}).join("")}</div>`;
+  }else{
+    const c=[...list].sort((a,z)=>(a.proxFecha||"9").localeCompare(z.proxFecha||"9"));
+    b.innerHTML=`<div class="bar"><span class="note">Ordenado por próxima acción. Vencidas primero.</span><button class="btn ghost" id="csv" style="margin-left:auto">Copiar como CSV</button></div>
+    <table class="stack"><thead><tr><th>Próx. acción</th><th>Empresa</th><th>Contacto</th><th>Etapa</th><th>Toques</th><th>Resp.</th></tr></thead><tbody>${c.map(p=>{const st=estado(p);return `<tr data-id="${esc(p.id)}">
+      <td><span class="${st?"next "+st:""}" style="${st?"display:inline-block;margin:0":""}">${p.proxFecha?fdate(p.proxFecha):"—"}</span> ${esc(p.proxAccion)}</td><td><b>${esc(p.empresa)}</b></td><td>${esc(p.contacto)}</td><td><span class="pill">${esc(ETQ[p.etapa]||"")}</span></td><td>${toques(p).length}</td><td>${esc(p.responsable)}</td></tr>`}).join("")}</tbody></table>`;
+  }
+  const dr=$("#drawer");if(openId&&!dr.hidden&&!dr.contains(document.activeElement)||openId&&!dr.hidden&&document.activeElement===$("#panel"))renderFicha();
+}
+function renderFicha(){
+  const p=items.find(x=>x.id===openId);if(!p){closeFicha();return}
+  const h=[...(p.historial||[])].sort((a,z)=>(z.fecha+z.ts).localeCompare(a.fecha+a.ts));
+  const link=u=>/^https:\/\//.test(u||"")?`<a href="${esc(u)}" target="_blank" rel="noopener" style="color:#fff">${esc(u.replace(/^https:\/\/(www\.)?/,""))}</a>`:"";
+  $("#panel").innerHTML=`<div class="ph"><button class="x" id="close" aria-label="Cerrar">×</button>
+    <h2 id="fichaTitle">${esc(p.empresa)}</h2><p>${esc([p.contacto,p.cargo].filter(Boolean).join(" · "))} ${p.email?"· "+esc(p.email):""} ${p.telefono?"· "+esc(p.telefono):""}</p>
+    <p>${[link(p.linkedin),link(p.web)].filter(Boolean).join(" · ")}</p></div>
+  <div class="pb">
+    <div class="row2"><label>Etapa<select id="fEtapa">${ETAPAS.map(([k,l])=>`<option value="${k}"${k===p.etapa?" selected":""}>${l}</option>`).join("")}</select></label>
+      <label>Prioridad<select id="fPrio">${["Alta","Media","Baja"].map(x=>`<option${x===p.prioridad?" selected":""}>${x}</option>`).join("")}</select></label></div>
+    <fieldset><legend>Registrar punto de contacto</legend>
+      <form id="fToque"><div class="chips">${chips("tipo","Llamada")}</div>
+      <div class="grid"><label class="full">Qué se hizo<textarea name="detalle" required placeholder="Ej.: llamé, atendió el gerente de operaciones, interesado en dimensionamiento"></textarea></label>
+      <label>Resultado<input class="in" name="resultado" placeholder="Ej.: pidió propuesta"></label><label>Fecha<input class="in" type="date" name="fecha" value="${hoy()}"></label>
+      <label>Próxima acción<input class="in" name="proxAccion" value="${esc(p.proxAccion)}"></label><label>Fecha próxima<input class="in" type="date" name="proxFecha" value="${esc(p.proxFecha)}"></label></div>
+      <div class="bar" style="margin:12px 0 0"><button class="btn">Agregar a la hoja de vida</button></div></form></fieldset>
+    <section><h3 style="font-size:18px;margin-bottom:12px">Hoja de vida <span class="note">· ${toques(p).length} toques</span></h3>
+      ${h.length?`<ul class="tl">${h.map(e=>`<li class="${e.tipo==="Sistema"?"sys":""}"><div class="when">${fdate(e.fecha)}/${esc((e.fecha||"").slice(2,4))} ${e.tipo!=="Sistema"?`<span class="pill">${esc(e.tipo)}</span>`:""}<button class="del" data-ev="${esc(e.id)}" aria-label="Quitar registro">quitar</button></div>
+        <div>${esc(e.detalle)}</div>${e.resultado?`<div class="res">Resultado: ${esc(e.resultado)}</div>`:""}</li>`).join("")}</ul>`:'<p class="note">Sin registros todavía.</p>'}</section>
+    <details><summary style="cursor:pointer;font-weight:600;min-height:44px;display:flex;align-items:center">Datos del prospecto</summary>
+      <form id="fDatos"><div class="grid" style="margin-top:10px">${[...F.gEmpresa,...F.gContacto,...F.gCalif.filter(f=>!["etapa","prioridad"].includes(f[0]))].map(f=>field(f,p[f[0]]||"")).join("")}</div>
+      <div class="bar" style="margin-top:12px"><button class="btn">Guardar cambios</button></div></form></details>
+    <div id="delZone"><button class="btn danger" id="delP">Eliminar prospecto</button></div>
+  </div>`;
+}
+function openFicha(id){openId=id;$("#drawer").hidden=false;renderFicha();$("#panel").focus()}
+function closeFicha(){openId=null;$("#drawer").hidden=true}
+function route(){const v=location.hash==="#carga"?"carga":"dashboard";
+  $("#v-dashboard").hidden=v!=="dashboard";$("#v-carga").hidden=v!=="carga";
+  $("#nav-dashboard").classList.toggle("on",v==="dashboard");$("#nav-carga").classList.toggle("on",v==="carga")}
+
+/* ---------- eventos ---------- */
+$("#panel").tabIndex=-1;
+addEventListener("hashchange",route);route();
+["q","fPri","fResp"].forEach(i=>$("#"+i).addEventListener("input",render));
+$("#vk").onclick=()=>{view="kanban";$("#vk").classList.add("on");$("#vl").classList.remove("on");render()};
+$("#vl").onclick=()=>{view="lista";$("#vl").classList.add("on");$("#vk").classList.remove("on");render()};
+$("#board").addEventListener("click",e=>{
+  if(e.target.id==="demo")return demo();
+  if(e.target.id==="csv")return copyCSV();
+  const c=e.target.closest("[data-id]");if(c)openFicha(c.dataset.id)});
+$("#board").addEventListener("keydown",e=>{const c=e.target.closest(".card");if(c&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openFicha(c.dataset.id)}});
+$("#board").addEventListener("dragstart",e=>{const c=e.target.closest(".card");if(!c)return;dragId=c.dataset.id;c.classList.add("drag");e.dataTransfer.effectAllowed="move"});
+$("#board").addEventListener("dragend",()=>{dragId=null;document.querySelectorAll(".drag,.over").forEach(x=>x.classList.remove("drag","over"))});
+$("#board").addEventListener("dragover",e=>{const col=e.target.closest(".col");if(col&&dragId){e.preventDefault();document.querySelectorAll(".over").forEach(x=>x!==col&&x.classList.remove("over"));col.classList.add("over")}});
+$("#board").addEventListener("drop",e=>{const col=e.target.closest(".col");if(!col||!dragId)return;e.preventDefault();cambiarEtapa(dragId,col.dataset.etapa)});
+function cambiarEtapa(id,et){const p=get(id);if(!p||p.etapa===et)return;log(p,"Sistema",`Etapa: ${ETQ[p.etapa]||"—"} → ${ETQ[et]}`);p.etapa=et;save(p);toast(`${p.empresa} pasó a ${ETQ[et]}`)}
+
+$("#fAlta").addEventListener("submit",e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));
+  if(!d.empresa.trim()){toast("Falta el nombre de la empresa");e.target.empresa.focus();return}
+  const p={id:uid(),creado:Date.now(),historial:[]};
+  for(const g in F)for(const [k] of F[g])p[k]=(d[k]||"").trim();
+  p.proxAccion=d.proxAccion.trim();p.proxFecha=d.proxFecha;
+  log(p,"Sistema",`Alta en ${ETQ[p.etapa]}${p.origen?" · origen: "+p.origen:""}`);
+  if(d.h_detalle.trim())log(p,d.h_tipo,d.h_detalle.trim());
+  save(p);e.target.reset();location.hash="#dashboard";openFicha(p.id);toast("Prospecto cargado")});
+
+$("#drawer").addEventListener("click",e=>{
+  if(e.target.id==="drawer"||e.target.id==="close")return closeFicha();
+  if(e.target.id==="delP"){$("#delZone").innerHTML='<p>¿Eliminar este prospecto y toda su hoja de vida? No se puede deshacer.</p><div class="bar"><button class="btn danger" id="delOk">Sí, eliminar</button><button class="btn ghost" id="delNo">Cancelar</button></div>';return}
+  if(e.target.id==="delNo")return renderFicha();
+  if(e.target.id==="delOk"){const id=openId;closeFicha();remove(id);toast("Prospecto eliminado");return}
+  const ev=e.target.closest("[data-ev]");if(ev){const p=get(openId);p.historial=p.historial.filter(h=>h.id!==ev.dataset.ev);save(p);renderFicha()}});
+$("#drawer").addEventListener("change",e=>{
+  if(e.target.id==="fEtapa"){cambiarEtapa(openId,e.target.value);renderFicha()}
+  if(e.target.id==="fPrio"){const p=get(openId);p.prioridad=e.target.value;save(p)}});
+$("#drawer").addEventListener("submit",e=>{e.preventDefault();const p=get(openId),d=Object.fromEntries(new FormData(e.target));
+  if(e.target.id==="fToque"){if(!d.detalle.trim())return toast("Contá qué se hizo");
+    log(p,d.tipo,d.detalle.trim(),{fecha:d.fecha||hoy(),resultado:d.resultado.trim()});p.proxAccion=d.proxAccion.trim();p.proxFecha=d.proxFecha;
+    if(p.etapa==="identificado"&&d.tipo!=="Nota"){log(p,"Sistema","Etapa: Identificado → Contactado (automático)");p.etapa="contactado"}
+    save(p);renderFicha();toast("Registrado en la hoja de vida")}
+  if(e.target.id==="fDatos"){if(!(d.empresa||"").trim())return toast("La empresa no puede quedar vacía");Object.assign(p,Object.fromEntries(Object.entries(d).map(([k,v])=>[k,v.trim()])));save(p);renderFicha();toast("Datos actualizados")}});
+addEventListener("keydown",e=>{if(e.key==="Escape"&&openId)closeFicha()});
+
+function copyCSV(){const cols=["empresa","contacto","cargo","email","telefono","rubro","ciudad","etapa","prioridad","responsable","proxAccion","proxFecha"];
+  const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;
+  const t=[cols.join(","),...filtered().map(p=>cols.map(c=>q(c==="etapa"?ETQ[p[c]]:p[c])).join(","))].join("\n");
+  navigator.clipboard.writeText(t).then(()=>toast("CSV copiado: pegalo en Excel o Sheets"),()=>toast("No se pudo copiar"))}
+function demo(){const d=n=>{const x=new Date();x.setDate(x.getDate()+n);x.setMinutes(x.getMinutes()-x.getTimezoneOffset());return x.toISOString().slice(0,10)};
+  [["Ejemplo · Clínica del Parque","Laura Gómez","Gerente de Administración","Salud","Córdoba","contactado","Alta","Enviar presentación corta",d(-1),"Llamada","Atendió, pidió info por mail"],
+   ["Ejemplo · Distribuidora Norte","Martín Ruiz","Dueño","Consumo masivo","Río Cuarto","dimensionamiento","Media","Reunión de dimensionamiento",d(0),"Reunión","Videollamada, tienen 4 personas atendiendo WhatsApp"],
+   ["Ejemplo · Seguros Andinos","Paula Ferrer","Jefa de Atención","Seguros","Mendoza","propuesta","Alta","Seguimiento de propuesta",d(3),"Propuesta","Enviada propuesta omnicanal"],
+   ["Ejemplo · Fintech Pampa","","","Fintech","Córdoba","identificado","Baja","Primer llamado",d(5),"",""]]
+  .forEach(([empresa,contacto,cargo,rubro,ciudad,etapa,prioridad,proxAccion,proxFecha,tipo,det])=>{
+    const p={id:uid(),creado:Date.now(),empresa,contacto,cargo,rubro,ciudad,etapa,prioridad,proxAccion,proxFecha,origen:"Base de datos",responsable:"EPC",historial:[]};
+    log(p,"Sistema","Alta (dato de ejemplo)");if(tipo)log(p,tipo,det);save(p)});toast("Datos de ejemplo cargados: borralos desde cada ficha")}
+}
+</script>
+</body>
+</html>
