@@ -197,7 +197,7 @@ document.body.insertAdjacentHTML("beforeend",'<datalist id="resps"><option value
 
 /* ---------- datos ---------- */
 function setStatus(t){$("#status").textContent=t}
-function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2600)}
+function toast(t){const e=$("#toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,t.length>80?9000:2600)}
 function get(id){const p=items.find(x=>x.id===id);return p?clone(p):null}
 const run=(id,fn)=>chains[id]=(chains[id]||Promise.resolve()).then(fn).then(r=>{if(r&&r.error)throw r.error}).catch(e=>{console.error(e);toast("No se pudo guardar en la base. Revisá la conexión y reintentá.");loadAll()});
 function save(p){
@@ -210,7 +210,7 @@ function save(p){
 function remove(id){items=items.filter(x=>x.id!==id);render();run(id,()=>SB.from("prospectos").delete().eq("id",id))}
 async function loadAll(){
   const {data,error}=await SB.from("prospectos").select("id,data");
-  if(error){setStatus("Sin acceso a la base");toast("Tu usuario no tiene acceso al CRM. Pedile a Lucas que te habilite.");return}
+  if(error){console.error(error);setStatus("Sin acceso a la base");toast("No se pudo leer la base: "+(error.code?error.code+" · ":"")+(error.message||"error desconocido"));return}
   items=data.map(r=>({...r.data,id:r.id}));setStatus("Sincronizado");render();
 }
 let live=null,reloadT=null;

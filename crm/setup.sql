@@ -43,3 +43,8 @@ create policy "equipo borra" on public.prospectos for delete to authenticated us
 do $$ begin
   alter publication supabase_realtime add table public.prospectos;
 exception when duplicate_object then null; end $$;
+
+-- 4. Permisos explícitos para la web (los proyectos nuevos no los dan solos).
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.prospectos to authenticated;
+grant execute on function public.es_del_equipo() to authenticated;
